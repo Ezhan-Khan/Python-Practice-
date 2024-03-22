@@ -52,16 +52,16 @@ world_df.shape
 
 world_df
 
-#FILTERING to ONLY view 'Rank' values BELOW 10:
-world_df[world_df['Rank']<=10]  
+#FILTERING NUMERIC VALUES - e.g. WHERE ONLY view 'Rank' values BELOW 10:
+world_df[world_df['Rank']<=10]   
 
-#                  '.isin(["value1", "value2"])' 
+#                  'df.isin(["value1", "value2"])' 
 #Filter rows to find for 'SPECIFIC COLUMN CATEGORY VALUES':
 #Use '.isin(["value1", "value2"])' SEVERAL POTENTIAL VALUES here
 world_df[world_df['Country'].isin(['Bangladesh', 'Brazil'])]    
-#Recall - same as 'IN' in SQL - e.g.  WHERE Country IN ("country1", "country2")
-
-#                   '.str.contains('string')':
+#Recall - same as 'IN' in SQL! - e.g.  WHERE Country IN ("country1", "country2")
+ 
+#                    '.str.contains('string')':
 #SIMILARLY can Filter for Columns which CONTAIN SPECIFIC STRINGS:
 world_df[world_df['Country'].str.contains('United')]
 #Recall - same as 'LIKE' in SQL!
@@ -70,7 +70,7 @@ world_df[world_df['Country'].str.contains('United')]
 #axis =1 for COLUMNs, =0 for ROWS
 world_df.filter(items = ['Country', 'Continent'], axis=1)    #obtains JUST 'Country' and 'Continent' COLUMNS
 #Can ALSO use with ' like="string" ' (FILTER ROW/COLUMN where it is LIKE Sometihng)
-#First, can Set 'Country' Column as INDEX:
+#First, need to Set 'Country' Column as INDEX:
 df = world_df.set_index('Country') 
 #Now can FILTER WHERE 'Index' Column is 'LIKE' that:   
 df.filter(like = 'United', axis=0)   #(ALTERNATIVE to '.contains' above!)
@@ -139,11 +139,12 @@ flavours_df = pd.read_csv(r"C:\Users\Ezhan Khan\Documents\PYTHON PRACTICE\PYTHON
 flavours_df
 #table of different Ice Cream Flavours, with RATINGS on whether liked, flavour, texture and TOTAL Rating.
 
-#Can GROUP BY 'Base Flavour' (find Aggregate stats for EACH Base Flavours)
+#Can GROUP BY 'Base Flavour' (find Aggregate Stats for EACH Base Flavours)
 grouped_flavours = flavours_df.groupby(['Base Flavor'], axis=0, as_index = False)
 #creates a 'groupby' OBJECT, which can be saved as variable
 #then, can find '.mean()' ('AGGREGATED AVERAGE' BY the GROUPED 'Base Flavor' Column)
 average_base_flavours = grouped_flavours.mean()
+average_base_flavours
 #can COMPARE the AVERAGE RATINGS for 'chocolate' vs 'vanilla' 
 
 #OTHER AGGREGATE FUNCTIONS - .count(), .min(), .max(), .sum()
@@ -152,8 +153,14 @@ grouped_flavours.min()  #take lowest values for 'chocolate' and 'vanilla' respec
 grouped_flavours.max()  #takes highest values
 grouped_flavours.sum()  #(only totals for NUMERICAL Columns, since cannot do this for Strings!)
 
+#ANOTHER WAY - specify AGGREGATE COLUMN after Column to GROUP BY
+df_grouped = flavours_df.groupby(['Base Flavor'])['Liked'].count().reset_index()
+df_grouped    #for EACH 'Base Flavor' counts those who LIKED it
+#need 'reset_index' to CONVERT BACK to DATAFRAME (from Series)
 
-#Alternatively, have 'AGGREGATION FUNCTION':   (BETTER if wanting to use SEVERAL Aggregate Functions SIMULTANEOUSLY!)
+
+
+#Alternatively, have 'AGGREGATION FUNCTION':   (BETTER IF wanting to use SEVERAL Aggregate Functions SIMULTANEOUSLY!)
 #'.agg({'column':['mean', 'max', 'count', 'sum'],...})'
 #-takes 'dictionary' argument
 #-'key-value' pairs, where 'key' = Column which is to be aggregated, Value = LIST of AGGREGATE FUNCTION(s) to APPLY to it!
@@ -163,6 +170,7 @@ flavours_df.groupby('Base Flavor').agg({'Flavor Rating':['mean', 'max', 'count',
 flavours_df.groupby('Base Flavor').agg({'Flavor Rating':['mean', 'max', 'count', 'sum'],'Texture Rating':['mean', 'max', 'count', 'sum']})    
 
 #all this, just returns AGGREGATE STATISTICS for EACH Specified Column, BY the GROUPED Column ('Base Flavor')
+
 
 #'GROUPING' BY 'MULTIPLE COLUMNS' 
 multiple_grouped = flavours_df.groupby(['Base Flavor', 'Liked'], axis=0, as_index = False)
@@ -194,7 +202,7 @@ df2 = pd.read_csv(r"C:\Users\Ezhan Khan\Documents\PYTHON PRACTICE\PYTHON for DAT
 df1
 df2
 
-#                  'MERGE' (most important method!)
+#                  'MERGE' (most important/BEST method!)
 
 #this is just like SQL Joins!  
 df1.merge(df2)   #DEFAULT = INNER JOIN (ONLY MATCHING IDs are MERGED!)
@@ -202,6 +210,22 @@ df1.merge(df2, how='inner')  #does SAME IF JOIN-METHOD is SPECIFIED in ARGUMENT 
 #BETTER to Specify COLUMN(s) to JOIN 'ON':
 df1.merge(df2, how='inner', on=['FellowshipID', 'FirstName'])  
 #OPTIONAL - can specify SUFFIXES 'suffixes = ('_x','_y')' - e.g. when joining by 'FellowshipID' COLUMN ONLY, which results in FirstName_x and FirstName_y for EACH respective TABLE!
+
+#What if we ONLY want SPECIFIC COLUMNS from EACH TABLE when JOINED?
+#Just use " pd.merge(left = ..., 
+#                   right = ... 
+#                   how=.., 
+#                   left_on =... ,
+#                   right_on=...)  "
+#e.g. - Joining Table with 'questions' column to the main table 'df_melted' 
+df_merged = pd.merge(left = df_melted, right = questions, how='left', left_on ='Question and Subquestion' , right_on="Question + Subquestion")
+#Note - ALWAYS CHECK NUMBER OF ROWS NEEDED at END of JOIN is CORRECT - EASY MISTAKE to MAKE! (i.e. ensure correct number of rows after joining!)
+print(f"Original Data: {len(df_melted)}")
+print(f"Merged Data: {len(df_merged)}")    #SAME LENGTH! Both 17028 - GOOD!
+
+#Note - If joining 2 tables and EACH have a Column with SAME NAME, will get 'x' and 'y' versions. AVOID this by RENAMING ONE of them BEFORE JOINING.
+
+
 
 # 'OUTER JOIN'
 df1.merge(df2, how='outer')  
@@ -249,6 +273,46 @@ pd.concat([df1,df2], join='inner', axis=1)
 df1.append(df2)   #DEPRECATED - STICK to 'pd.conact' in FUTURE!!!
 
 
+
+#%%                     'CONCAT' - More Practice:
+
+import pandas as pd
+
+#Create the DataFrames needed for this example:
+india_weather = pd.DataFrame({
+    "city": ["mumbai", "delhi", "banglore"],
+    "temperature":[32, 45, 30],
+    "humidity": [80,60,78]
+})
+india_weather
+
+us_weather = pd.DataFrame({
+    "city": ["new york", "chicago", "orlando"],
+    "temperature":[21, 14, 35],
+    "humidity": [68,65,75]
+})
+us_weather
+
+# Joining these dataframes with pd.concat:
+df = pd.concat([india_weather, us_weather], ignore_index = True)
+df
+#Note - INDEX is NOT CONTINUOUS (not 0, 1, 2, 3, 4, ...). 
+#So? changed to CONTINUOUS Index using 'ignore_index' argument - just makes the index NEW for this new dataframe!
+#now, is '0, 1, 2, 3, 4, 5..' 
+
+#'keys' ARGUMENT:
+#-associates particular 'key' with EACH Dataframe
+df2 = pd.concat([india_weather, us_weather], 
+               keys = ["india", "us"])
+#just adds 'CHARACTER INDEX' for EACH Dataframe too!
+df2  #'india' for cities in India, 'us' for cities in US
+#can USE these indexes when using '.loc':
+df.loc["us"]
+
+
+
+
+
 #%%                         PANDAS 'VISUALISATION'
 
 import pandas as pd
@@ -269,7 +333,7 @@ plt.style.use('seaborn-darkgrid')
 
 #PLOT in PANDAS by using '.plot()' method:
 #specify x, y and 'kind' of PLOT we want ('line', 'bar', 'barh', 'hist', 'box', 'kde')    
-df.plot(x='Date', y=['Flavor Rating', 'Texture Rating', 'Overall Rating'], kind='line')
+df.plot(x='Date', y=['Flavor Rating', 'Texture Rating', 'Overall Rating'], kind='line', figsize=(12,10))
 #can also add title, grid, legend, style, change 'labels'...
 
 #'subplots = True' gives SEPARATE PLOTS for EACH 'y' Variable:
@@ -284,7 +348,7 @@ df.plot(x='Date', y=['Flavor Rating', 'Texture Rating', 'Overall Rating'], kind=
 #Could make it 'STACKED' by specifying 'stacked = "True"
 df.plot(kind='bar', stacked=True)
 #JUST for 'Flavor Rating' Column:
-df.plot(x='Date', y='Flavor Rating', kind='bar', stacked=True)
+df.plot(x='Date', y='Flavor Rating', kind='bar', stacked=Tr.ue)
 #'HORIZONTAL' BAR Chart - 'barh':
 df.plot(x='Date', y=['Flavor Rating', 'Texture Rating', 'Overall Rating'], kind='barh', stacked = True, title='Ice Cream Ratings', xlabel = 'Daily Ratings', ylabel = 'Scores')    
 #(LOOKS BETTER when there are MANY 'x' LABELS!!)
@@ -302,7 +366,7 @@ df.plot(x='Texture Rating', kind='hist', bins = 4, c="darkblue")
 
 
 #Looking at BOXPLOT:
-df.boxplot()
+df.boxplot(figsize=(5,5))
 #can COMPARE 'Medians' and overall distribution of data for EACH Variable
 
 
