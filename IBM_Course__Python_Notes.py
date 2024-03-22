@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+/# -*- coding: utf-8 -*-
 
 #  import sys   then doing 'sys.version'  - tells us VERSION of PYTHON (i.e. looks at SYSTEM settings)
 
@@ -12,14 +12,14 @@
 
 #%%         Working with DIFFERENT 'FILE FORMATS' (csv, xml, json, xlsx)
 
-#                     'Data Engineering' involves:
+#                     'Data Engineering' involves 'ETL':
 # 'Data Extraction' - get data from MULTIPLE SOURCES     
 # 'Data TRANSFORMATION' - REMOVE UNECESSARY Data, ONLY Keeping what we NEED for ANALYSIS, data from multiple sources converted to SAME FORMAT
 # 'Data LOADING' - LOAD data INSIDE a 'Data WAREHOUSE' (=LARGE VOLUMES of Data accessed to GATHER INSIGHTS)
 
 # RARELY get 'NEAT' Tabular Data, so MUST be able to deal with DIFFERENT 'File Formats'.
 
-#Python can make PROCESS of READING Data from DIFFERENT File Formats using LIBRARIES!
+#Python can make PROCESS of READING Data from DIFFERENT File Formats SIMPLE, using LIBRARIES!
 
 #                  'Pandas' (JUST RECAP):
 #   pd.read_csv('file.csv')  - SIMPLE, know this!
@@ -104,157 +104,6 @@ df = df.append(pd.Series([name, phonenumber, birthday], index=columns)....,ignor
 #usually 'IMAGES' like 'JPEGs', 'GIFs', 'MP3s', Binary Documents like WORD or PDF 
 img = Image.open('dog.jpg')
 display(img)
-
-
-
-
-
-#%%                  'WEBSCRAPING' (with PYTHON)
-
-#                 HTML BASICS (See Codecademy Course!)
-# Say we want to find info on Basketball Players from a Website 
-# Can use 'HTML TAGS' and View HTML COMPOSITION of the Page
-# '<body>' of HTML is what we are INTERESTED in
-
-# Get 'Hyperlink Tags' (clicking takes you to a website)
-
-#e.g. WIKIPEDIA - can SELECT HTML Element and INSPECT it (also get CSS and JavaScript)
-
-#EACH HTML Document can be REFERRED to as 'HTML TREE'
-# - is a TREE structure, with <html> as the PARENT Tag, then with INDENTED parts for <head>, then Indended further for INNER Layers...
-
-#HTML Tables - given 'tr' TAGS. FIRST Row has <td>.....<td>   ...so on so on...
-
-
-#     WEBSCRAPING = Automatically 'EXTRACT INFO' from 'WEBPAGES' (in minutes, using PYTHON!)
-#use 'requests' and 'BeautifulSoup' Python Modules
-
-#    EXAMPLE- finding 'Name and Salary' of 'Basketball Players' from WEBPAGE
-from bs4 import BeautifulSoup
-#Can STORE the 'WEBPAGE HTML' as a 'STRING:
-html = "<!DOCTYPE html><html><head><title>Page Title</title></head><body><h3><b id='boldest'>Lebron James</b></h3><p> Salary: $ 92,000,000 </p><h3> Stephen Curry</h3><p> Salary: $85,000, 000 </p><h3> Kevin Durant </h3><p> Salary: $73,200, 000</p></body></html>"
-#PASS the HTML into 'BeautifulSoup()' INSTANCE
-soup = BeautifulSoup(html, 'html5lib')
-#('BeautifulSoup()' represents the Document as a NESTED Data Structure - TREE-LIKE Objects which can be PARSED)
-soup   
-#Can make this HTML file LOOK NICER to View, with 'prettify()' function (But NOT NECESSARY):
-print(soup.prettify())
-
-#'TAG' Object = HTML Tag in ORIGINAL DOCUMENT (e.g. 'title' tag):
-tag_object = soup.title  #EXTRACT the <title>....<title> Object FROM the 'HTML file'
-print(tag_object)   # '<title>Page Title</title>'
-type(tag_object)    #'bs4.element.Tag' Object TYPE
-
-#Note: if MORE THAN ONE TAG with SAME NAME, then FIRST ELEMENT WITH that Tag Name is CALLED. 
-tag_object = soup.h3   #have 3 Tags called '<h3>' 
-tag_object    #given as '<h3><b id="boldest">Lebron James</b></h3>'
-
-#If we want to NAVIGATE 'DOWN the TREE BRANCH'?
-tag_child = tag_object.b  #since '<b ....</b> is a CHILD, WITHIN '<h3>'
-tag_child
-#Can ACCESS 'parent' FROM this, using '.parent' Attribute:
-print(tag_child.parent)   # - BACK to 'tag_object' (EXACT SAME!)
-#'.parent' for 'tag_object' is 'body' Element:
-tag_object.parent   #Goes FURTHER OUT to '<body>'!!
-
-#'SIBLING' of 'tag_object' is given as 'paragraph':
-sibling_1 = tag_object.next_sibling
-sibling_1     # <p> Salary: $ 92,000,000 </p>'  -  <p> = 'Paragraph'
-#OTHER SIBLING of 'sibling_1' (and therefore of 'tag_object' too):
-sibling2 = sibling_1.next_sibling
-sibling2      # <h3> Stephen Curry</h3>   -  '<h3>' = 'HEADER' Element
-#'next_sibling' for 'sibling_2':
-print(sibling2.next_sibling)   #<p> Salary: $85,000, 000 </p>   = SALARY of 'Stephen Curry'
-
-#Access 'TAG ATTRIBUTES' of HTML - treat TAG like a 'DICTIONARY VALUE':
-tag_child['id']    # Gives 'boldest'  -  i.e. Accesses VALUES WITHIN 'TAG'   
-tag_child.attrs  #ACCESSES Attribute as DICTIONARY  {'id':'boldest'}  (attribute = Dictionary 'value')
-#(Alternative to Above, can use '.get()' function):
-tag_child.get('id')  # (see Dictionary Notes!)
-
-#'NAVIGABLE STRING' = Can EXTRACT 'TEXT' from Tag 'as STRING':
-tag_string = tag_child.string   # returns as 'STRING' (like Python String)
-tag_string    # 'Lebron James' 
-type(tag_string)  #bs4.element/'NavigableString'
-#Can CONVERT this 'Navigable String' to PYTHON STRING:
-str(tag_string)   #SAME! (Python String ALSO called 'Unicode String'!)
-
-#                  'FILTERING' TAGS (for TABLES)
-#'find_all' function - FILTERS Tags, BASED on Tag Name, Attributes, Text or COMBINATION of these:
-table="<table><tr><td id='flight'>Flight No</td><td>Launch site</td> <td>Payload mass</td></tr><tr> <td>1</td><td><a href='https://en.wikipedia.org/wiki/Florida'>Florida<a></td><td>300 kg</td></tr><tr><td>2</td><td><a href='https://en.wikipedia.org/wiki/Texas'>Texas</a></td><td>94 kg</td></tr><tr><td>3</td><td><a href='https://en.wikipedia.org/wiki/Florida'>Florida<a> </td><td>80 kg</td></tr></table>"
-#HERE, Create 'HTML TABLE': 
-table_bs = BeautifulSoup(table, 'html5lib')
-table_bs
-#Use 'find_all('Tag Name') to Extract 'ALL TAGS' with THAT 'NAME' (including 'CHILDREN' TOO!)
-table_rows = table_bs.find_all(name = 'tr')
-table_rows   
-#Here, finds ALL Elements which is TAG Object for 'tr'
-#is JUST like Python LIST, where we can 'ACCESS ELEMENTS' by 'INDEX':
-first_row = table_rows[0]  #gets FIRST ROW (HEADER)
-type(first_row)   #given as 'bs4.element.Tag'
- 
-#Can even 'ITERATE THROUGH' EACH 'Table Cell':
-for i, row in enumerate(table_rows):
-    print(f"row {i}")           #ITERATE Through EACH ROW (like list elements!)
-    cells = row.find_all("td")   #Finds ALL Table CELLS (Row = 'CELL')
-    for j, cell in enumerate(cells):
-        print(f"Column {j}, Cell {cell}")  #Iterate THROUGH Variable CELLS for EACH ROW
-#so, for EACH ROW/Cell (row 0,1,2...), can EXTRACT VALUES for EACH COLUMN (column 0, 1, 2...)
-
-list_input = table_bs.find_all(name = ["tr", "td"])
-list_input   
-
-# IF 'Argument' NOT RECOGNIZED, is TURNED into 'FILTER' (on TAG ATTRIBUTES)
-#    i.e. SO can ALSO use 'TAG ATTRIBUTE= ' as an ARGUMENT:    
-#e.g. - First 'td' elements have Value of 'id' of 'flight', so can FILTER based on THAT 'id' Value:    
-print(table_bs.find_all(id = 'flight'))  # [<td id="flight">Flight No</td>]
-#e.g.2 - Finding ALL ELEMENTS with LINKS to 'Florida Wikipedia Page'
-list_input = table_bs.find_all(href = "https://en.wikipedia.org/wiki/Florida")
-list_input    # '[<a href="https://en.wikipedia.org/wiki/Florida">Florida</a>, <a href="https://en.wikipedia.org/wiki/Florida">Florida</a>]' 
-#SETTING 'href' to 'True' (finds ALL TAGS with 'href' ATTRIBUTE)
-print(table_bs.find_all(href=True))  #ALL TAGS with 'href'
-print(table_bs.find_all(href=False))  #All Tags WITHOUT 'href' Value/Attribute
-
-#e.g.3 - Finding element with ' id = "boldest" ' for 'soup':
-print(soup.find_all(id = "boldest"))   # [<b id="boldest">Lebron James</b>]
-
-#SIMILARLY, can SEARCH, for 'STRINGS ATTRIBUTE' INSTEAD of 'tags':
-table_bs.find_all(string = "Florida")  #Finds ALL ELEMENTS with 'Florida'  ['Florida', 'Florida']
-
-#INSTEAD of 'find_all()' method, can use 'find()' to get 'FIRST ELEMENT' in the DOCUMENT:
-two_tables="<h3>Rocket Launch </h3><p><table class='rocket'><tr><td>Flight No</td><td>Launch site</td> <td>Payload mass</td></tr><tr><td>1</td><td>Florida</td><td>300 kg</td></tr><tr><td>2</td><td>Texas</td><td>94 kg</td></tr><tr><td>3</td><td>Florida </td><td>80 kg</td></tr></table></p><p><h3>Pizza Party  </h3><table class='pizza'><tr><td>Pizza Place</td><td>Orders</td> <td>Slices </td></tr><tr><td>Domino's Pizza</td><td>10</td><td>100</td></tr><tr><td>Little Caesars</td><td>12</td><td >144 </td></tr><tr><td>Papa John's </td><td>15 </td><td>165</td></tr>"
-two_tables_bs= BeautifulSoup(two_tables, 'html.parser')
-two_tables_bs.find("table")  #e.g. Finds FIRST TABLE using "table" NAME TAG
-#FILTERING on 'CLASS ATTRIBUTE' to find SECOND Table:
-two_tables_bs.find("table", class_='pizza')   #FILTER on 'class_ ATTRIBUTE' TOO to find for 2nd Table, with "pizza" class_.
-
-
-# 'WEBPAGE EXAMPLE':
-import requests
-from bs4 import BeautifulSoup
-#Use 'get' Method (like APIs) to GET the WEPAGE Data 
-url = "http://www.ibm.com"
-page = requests.get(url).text   #Using '.text' to get AS 'TEXT'
-#Create 'BeautifulSoup OBJECT':
-soup = BeautifulSoup(page, "html5lib")
-#FILTER for ALL 'a' Tags (using .find_all('a')):
-artists = soup.find_all('a')
-artists
-
-for link in soup.find_all('a',href=True):  # in html anchor/link is represented by the tag <a>
-    print(link.get('href'))    #SCRAPES All 'LINKS' -  'https://www.ibm.com/cloud?lnk=intro'
-
-#Get ALL ROWS from a Table:
-for row in table.find_all('tr'):  #'tr' = Table ROW in HTML
-    cols = row.find_all('td')     #'td'= Table COLUMN in HTML
-    color_name = cols[2].string
-    color_code = cols[3].text
-    print("{}--->{}".format(color_name,color_code))
-   
-
-
-
-
 
 
 
@@ -401,7 +250,7 @@ import requests  #'requests' library
 url ='https://www.ibm.com/'     
 r = requests.get(url)   #'GET' the 'RESPONSE' OBJECT, saved as variable 'r'
 #Accessing ATTRIBUTES of the 'Response':
-r.status_code  # = 200  =  indicates 'SUCCESS'!
+r.status_code  # = '200'  =  indicates 'SUCCESS'!
 print("request body: ", r.request.body)  # NONE (nothing in 'request' body for 'get' request)
 #Viewing HEADERS:
 r.headers  #given as 'Dictionary'
@@ -565,8 +414,10 @@ print(cats_df)
 
 #%%               PANDAS
 import pandas as pd
+import numpy as np
+import seaborn as sns
 # df = pd.read_csv('.csv file')  
-# df = pd.read_excel('xlxs_path')
+# df = pd.read_excel('xlxs_path', sheet_name = "sheet_we_want")
 
 #OR, could CREATE a 'DATAFRAME FROM 'DICTIONARY' (if dictionary is like 'Key: [values]'!)
 songs = {'Album':['Thriller', 'Back in Black', 'The Dark Side of the Moon', 
@@ -578,8 +429,9 @@ print(songs_df)
 #Accessing ('SELECT') SPECIFIC COLUMN(s) using [['column_name']] DOUBLE-BRACKETS:
 columns_from_df = songs_df[['Album', 'Released']]  # = NEW Dataframe of ONLY SELECTED Columns!
 
-#Accessing 'SPECIFIC VALUES' or 'SPECIFIC ROWS' from DataFrame: 
-# 'BY INDEX' = use '.iloc[row_index, col_index]', 'BY LABEL' - 'loc[row_index, ]':
+#Accessing 'SPECIFIC VALUES'/'SPECIFIC ROWS' from DataFrame: 
+# 'BY INDEX' = use '.iloc[row_index, (col_index])'
+# 'BY LABEL' - 'loc[row_index,..]'
 print(songs_df.iloc[2])   #e.g. accesses 3rd ROW Index
 print(songs_df.loc[2])    #SAME HERE - (since LABEL is 'INDEX' Column)
 
@@ -591,29 +443,33 @@ print([songs_df[1:3]])
 df.rename(columns = {"old_header":"new_header"}, inplace=True)
 #note: 'inplace=True' simply means ORIGINAL DataFrame is CHANGED!
 
-#'SORTING' a DataFrame BY a COLUMN:
+#'SORTING' DataFrame BY a COLUMN:
 #Use 'df.sort_values(by=['Column_Name'], ascending = True or False)
-songs_df = songs_df.sort_values(by=['Released'], ascending = True)
-songs_df.head()     #Now, is SORTED by YEAR (Ascending)    - SIMPLE!
+songs_df = songs_df.sort_values(by=['Released'], ascending = False)
+songs_df.head(10)     #Top 10 - SORTED by YEAR (DESCENDING)    
 
 # To get ONLY 'UNIQUE VALUES' FROM a COLUMN:
 unique_albums = songs_df['Album'].unique()  
 
 # 'dataframe.drop(["columns Name" or "Rows Index"], axis ('=1' for 'COLUMNS', =0 for ROWS), inplace = True)
-songs_df.drop([5], axis = 0, inplace = True)   #DROPS 'row 6' FROM the DataFrame PERMENANTLY!
+songs_df.drop([5], axis = 0, inplace = True)   #DROPS 'ROW 6' FROM the DataFrame PERMENANTLY!
 songs_df
 
-dataframe.dropna(subset=["specific column"], axis=0, inplace = True)
-#REMOVES 'NA/MISSING' Values from SPECIFIC COLUMN ('Subset') - SIMPLE! 
-#Note:  'inplace=True' argument 'DIRECTLY CHANGES' the 'DATAFRAME'. WITHOUT 'inplace' will NOT CHANGE the ORIGINAL DATAFRAME! 
-#        'axis=0' modifies ROWS of DataFrame 
-# 'np.NaN' = a 'Not a Number' Value. 
-#e.g. REPLACE with 'NaN' using 'df.replace("?", np.nan, inplace=True)'  - replaces EACH OCCURENCE of '?' character WITH 'nan'
-#WHY? - So, NOW can use 'dropna'! 
+#Can also 'DROP ROWS BASED ON CONDITION' (use INDEX and '.loc' to FIND Rows to Drop):
+for x in df.index:
+    if df.loc[x, 'Do_Not_Contact'] == 'Y'
+    df.drop(x, axis=0, inplace=True)
+#e.g.2 - Dropping IF 'Phone Number' is BLANK:
+for x in df.index:
+    if df.loc[x, 'Phone_Number'] == '':
+        df.drop(x, axis=0, inplace=True)
 
 
-# 'df.isnull()' - MISSING VALUES as 'BOOLEANS' (True = MISSING, False = NOT Missing)
-#Then could LOOP for EACH COLUMN in the Dataframe, and do 'missing_data[column].value_counts()'
+
+#                     MISSING VALUES:
+
+# 'df.isnull()' - gives MISSING VALUES as 'BOOLEANS' (True = MISSING, False = NOT Missing)
+#THEN, could LOOP for EACH COLUMN in the Dataframe, and do 'missing_data[column].value_counts()'
 missing_data = songs_df.isnull()
 for column in missing_data.columns.values:   #GIVES 'Column Headers' as a LIST, so can ACCESS for EACH COLUMN EASILY!
     print(column)
@@ -623,55 +479,162 @@ for column in missing_data.columns.values:   #GIVES 'Column Headers' as a LIST, 
 #Side Note - '.value_counts()' ONLY works on Panads 'SERIES' NOT Dataframe, so use SINGLE BRACKETS [column] to get SERIES (not [[columns]])!
 #Just use '.to_frame()' to CONVERT BACK to DATAFRAME!
 
+#OR, view Nulls as PERCENTAGE of TOTAL:
+for col in df.columns:
+    pct_missing = np.round(np.mean(df[col].isnull()),2)  #find missing data
+    print(f'{col} - {pct_missing}%')  #for each column, as f-string
+
+#EASIEST WAY to VIEW NULLS in EACH COLUMN:
+isnull_df = df.isnull().sum()    #just do 'sum()' afterwards!!!
 
 #note: OR could use '.notnull()' - just opposite!
+notnull_df = df.notnull().sum()
 
+#REPLACE NULLS with BLANKS:
+df.replace(np.nan, '', inplace=True)    
+    
+#OR can DROP all NULLS/Missing Data:
+dataframe.dropna(subset=["specific column"], axis=0, inplace = True)
+#REMOVES 'NA/MISSING' Values from SPECIFIC COLUMN ('Subset') 
+# (Note: 'inplace=True' argument 'DIRECTLY CHANGES' the 'DATAFRAME'. WITHOUT 'inplace' will NOT CHANGE the ORIGINAL DATAFRAME!)
+#        'axis=0' modifies ROWS of DataFrame 
+# 'np.NaN' = a 'Not a Number' Value. 
+#e.g. REPLACE with 'NaN' using 'df.replace("?", np.nan, inplace=True)'  - replaces EACH OCCURENCE of '?' character WITH 'nan'
+#WHY? - So, NOW can use 'dropna'! 
+    
+
+
+#'df.nunique()' = NUMBER of UNIQUE VALUES per COLUMN 
+#(may be handy when performing some EDA)
+songs_df.nunique() 
+#viewing just for 'Album' Column: 
+songs_df['Album'].nunique()   #5 unique values in 'Album' Column
+
+#CORRECT WAY to find Number of Respondents for EACH Question:
+#FIND ALL values in 'Answer' Column which are 'NOT NULL' (NULLS NOT NEEDED in the Count!):
+respondents = df_merged[df_merged['Answer'].notnull()]
+respondents   #just FILTERED to ONLY get ROWS where 'Answer' is NOT NULL
+#Using .groupby WITH '.nunique()'
+total_respondents = respondents.groupby('Question')['Respondent ID'].nunique().reset_index()
+respondents.groupby('Question')['Respondent ID'].nunique().reset_index()
+#So, for EACH Question, get Total Number of (UNIQUE) Respondents!
+
+
+
+#can CHANGE SETTINGS so ALL ROWS are displayed when CALLING Dataframe:
+pd.set_option('display.max_rows', None)
+#Or, can set Number of DECIMAL PLACES for FLOAT Columns (e.g. 2dp):
+pd.set_option('display.float_format', lambda x: '%.2f'% x)
+
+    
+# 'dataframe.duplicated()' - VIEW 'DUPLICATE ROWS' ONLY  
+duplicate_rows = df[df.duplicated()]
 
 # 'df.drop_duplicates()' - REMOVES ALL 'DUPLICATE ROWS':
 songs_df = songs_df.drop_duplicates()   #had 'Back in Black' TWICE, so REMOVED this!
+#this is usually the FIRST STEP of ANY DATA CLEANING!
 
-# 'dataframe.duplicated()' - ACCESS 'DUPLICATE ROWS' ONLY  
-duplicate_rows = df[df.duplicated()]
 
-# dataframe.'groupby()' - GROUPS DATAFRAME (AGGREGATION!)
+
+#Viewing CORRELATIONS between NUMERIC Columns:
+df.corr()  #simple correlation table
+#BETTER to use HEAT MAP to achieve this
+sns.heatmap(df.corr(), annot=True)
+matplotlib.rcParams['figure.figsize'] = (20,8) 
+plt.title("Correlation Matrix for Numeric Features")
+plt.xlabel("Movie Features")
+plt.ylabel("Movie Features")  
+plt.show()
+
+#Use 'df.str.contains("string")' like 'LIKE' in SQL
+#Use 'df.isin(["value1", "value2"])' like 'WHERE...IN ()' in SQL
+
+
+# df.'groupby()' - GROUPS DATAFRAME (AGGREGATION!)
 #df.groupby([by], axis=0, as_index = False, ...)
+df.groupby('city').mean().sort_values(by='temperature', ascending=False)    
+#grouped by 'city', then SORTED by 'temperature' DESCENDING (highest to lowest)
+
 
 # 'JOINS' ('Merging' DataFrames based on Primary-Foreign Key Pairs) in PYTHON (with pandas):
 #  'pd.merge(df1, df2, on = ["col1", "col2"])' 
 
+#REORDER Columns from '2022 - 2017' TO '2017-2022':
+#using '[::-1]'  -  df2 = df2[::-1]  
+#Can TRANSPOSE dataframe using '.transpose()'
+df_transposed = df.transpose() #FLIPS around COLUMNS and ROWS
+#Can use this to Convert WIDE Data to LONG Data when PLOTTING
+
+#             UNPIVOTTING Data (WIDE DATA into LONG DATA)
+#Use '.melt()' method:
+#         ' df.melt(id_vars, 
+#                   value_vars, 
+#                   var_name, 
+#                   value_name) '
+#  id_vars = identifier variables (these are kept the SAME)
+#  value_vars = what variables to UNPIVOT (becomes LONG Data)
+#     (great documentation for 'Pandas' on their website)
+
+#e.g. converting Multiple Columns for 'Questions' into One Column for QUESTIONS and Another Column for ANSWERS
+#select column headers used in 'id_vars'
+id_vars = list(df_modified.columns[:8])
+id_vars 
+#select column headers used for 'value_vars' (i.e. UNPIVOT All 'QUESTIONS' (1 Column contains QUESTIONS, Another contains ALL ANSWERS)):
+value_vars = list(df_modified.columns[8:])
+value_vars
+#Now, also add NAMES for 'Variable' Column = QUESTIONS (and Subquestions) and 'Value' Column = ANSWERS
+#(given by 'var_name' and 'value_name')
+df_melted = df_modified.melt(id_vars=id_vars, 
+                             value_vars = value_vars,
+                             var_name = "Question and Subquestion", 
+                             value_name = "Answer")
+
+
+
+
+
+#            REPLACING COLUMN VALUES: (.replace())
 # Can use df["Column"]'.replace()' to REPLACE 'COLUMN VALUES' with NEW VALUES (JUST like using '.replace()' with STRINGS!!!)
-songs_df["Album"].replace("The Bodyguard", "The Bootyguard", inplace=True)
+songs_df["Album"].replace("The Bodyguard", "The Guard", inplace=True)
 
 # list(df.columns.values) - GIVES the COLUMN NAMES as a LIST! Useful to Look over!
 
 # 'ADD HEADER ROW'  -  'df.columns' = ["Header 1", "Header 2"...] 
 
-# 'df.info()' - provides INFO about DataFrame (including INDEX dtype and COLUMNS, 'Non-Null Values' and MEMORY USAGE)
+# 'df.info()' - provides INFO about DataFrame 
+#(including INDEX 'dtype' and 'COLUMNS', 'NON-NULL Values' and MEMORY USAGE)
 
+
+#Viewing SPECIFIC DATA TYPES in DATAFRAME - '.select_dtypes()'
+df.select_dtypes(include = 'number')
+#include = 'number' is for NUMERICAL DATA, include = 'object'
+#useful to CHECK to ensure they make sense!     
+
+    
 # CONCATENATE 2 DataFrames Columns TOGETHER with:
 #'pd.concat([df1, df2], axis=1)'
 #('axis=1' concatenates AS COLUMNS (ALONG), 'axis=0' concatenates AS ROWS (DOWN) - like 'UNION' in SQL!)
 
 
-#  'FILTERING ROWS' for Pandas Dataframe - Specify Condition and Put INSIDE the SELECTION of DataFrame:
+#  'FILTERING ROWS' in Pandas Dataframe - Specify Condition and Put INSIDE SELECTION of DataFrame:
 df_new = songs_df[songs_df['Released'] >= 1980]
 print(df_new.head())    #Now is JUST for ROWS where 'Released' >= 1980
 
 #'SET' specific 'COLUMN' AS 'ROW-INDEX COLUMN', using '.set_index(" ")'
 df_setting = songs_df.set_index("Album")
 df_setting
-#NOW when we use 'loc', MUST USE 'LABELS' in 'INDEX Column' as ROW Argument TOO!:
+#NOW when we use 'loc', MUST USE 'LABELS' in 'INDEX Column' as 'ROW' Argument TOO!:
 df_setting.loc["Back in Black", 'Released']
 
 #OR, can use 'df.index' = new_index (SPECIFY a NEW INDEX COLUMN, using a LIST)
 
-#Save 'DataFrame' to a CSV File using '.to_csv('.csv')' method
+#SAVE 'DataFrame' TO 'CSV File' using '.to_csv('.csv')' method
 df_new.to_csv('saving_DataFrame_as_CSV.csv', index = False)
-#note: 'index = False' just REMOVES the INDEX COLUMN of the DataFrame - SIMPLE!
+#note: 'index = False' just REMOVES INDEX COLUMN of DataFrame - SIMPLE!
 
 
 
-#         'SERIES'   ( = like 'SINGLE COLUMN' 1D ARRAY or a '1D DATAFRAME')
+#           'SERIES'   ( = like 'SINGLE COLUMN' 1D ARRAY or a '1D DATAFRAME')
 data = [10, 20, 30, 40, 50]
 series = pd.Series(data)      #'pd.Series(data)'
 series   #essentially a 'single column' array!
@@ -702,7 +665,7 @@ type(id)  #dataframe object
 multiple_columns = df[['Department', 'Salary', 'ID']]
 multiple_columns
 
-#               'Another Example' (PRACTICE):
+#                 'Another Example' (PRACTICE):
 dict = {'Student':['David', 'Samuel', 'Terry', 'Evan'],
         'Age':[27,24,22,32],
         'Country':['UK', 'Canada', 'China', 'USA'],
@@ -714,8 +677,8 @@ dataframe
 b = dataframe[['Marks', 'Course']]   #selecting 2 columns
 b
 
-#Using 'loc' and 'iloc' to ACCESS 'SPECIFIC VALUES' from DataFrame:
-dataframe.iloc[0,2]   #1st Row , 3rd Column , gives 'UK'
+#Practicing 'loc' and 'iloc' to ACCESS 'SPECIFIC VALUES' from DataFrame:
+dataframe.iloc[0,2]  #1st Row , 3rd Column , gives 'UK'
 dataframe.loc[2, "Course"]  #3rd Row, "Course' Column 'LABEL' - 'Machine Learning'
 
 #'SET' SPECIFIC 'COLUMN' AS 'INDEX COLUMN', using '.set_index("Name")'
@@ -732,18 +695,19 @@ dataframe.iloc[1:3, 0:1]    #accessed '2nd-3rd Rows', '1st Column'
 
 
 
-#%%             'SPLITTING DataFrame COLUMNS' in 'PYTHON'
+#%%              'SPLITTING DataFrame COLUMNS' in 'PYTHON'
 #'SPLITTING' One 'COLUMN' into 'MULTIPLE COLUMNS'
 
 # If Column Contains 'STRINGS':
-#Can SPLIT 'by DELIMITER':
-#Use  ' column.str.split('delimiter') '
+#i.e. Can SPLIT 'by DELIMITER':
+#Use ' column.str.split('delimiter') '
 #      df['split_column'] = df['column'].str.split('delimiter') 
 #BUT.. gives us Just ONE COLUMN of 'LISTS' as Row Values (since .split outputs a LIST)
-#BUT we WANT '2 NEW COLUMNS' - SO?
+#We WANT '2 NEW COLUMNS' - SO?
 #INSTEAD, do:    
 #    df[['new_col1', 'new_col2']] = df['column'].str.split(' ', n=max_splits(optional), expand=True)
-# NOTE: 'expand=True' (needed if non-uniform number of splits i.e. SPLITS of DIFFERENT LENGHTS, therfore can place 'None' for any MISSING Values, OTHERWISE would give ERROR!)
+#OPTIONAL - could specify 'number of splits' (n=...)
+# NOTE: 'expand=True' (needed if non-uniform number of splits i.e. SPLITS of DIFFERENT LENGTHS, therefore can place 'None' for any MISSING Values, OTHERWISE would give ERROR!)
 #NEED 'expand=True' to make it WORK - get 2 Spit COLUMNS now!
 
 #Example of 'STRING' SPLITTING:
@@ -751,37 +715,49 @@ split_df = pd.DataFrame({'AB': ['A1-B1', 'A2-B2']})
 split_df
 split_df['Split'] = split_df['AB'].str.split('-')
 split_df   #BUT, get Column of LISTS - NOT 2 SPLIT Columns!
-#So? can use way SHOWN ABOVE:
-split_df[['A','B']] = split_df['AB'].str.split('-')
-split_df   #AWESOME! NOW has SPLIT into 2 SEPARATE COLUMNS, NOT 1 Column of a 2 Element LIST! 
+#So? Must instead SPECIFY 'NEW SPLIT Columns' (BELOW):
+split_df[['A','B']] = split_df['AB'].str.split('-', expand=True)
+split_df      #AWESOME! NOW has SPLIT into 2 SEPARATE COLUMNS, NOT 1 Column of a 2 Element LIST! 
 #ALTERNATE WAY - can do 'TUPLE UNPACKING':
 split_df['A'], split_df['B'] = split_df['AB'].str.split('-', n=1).str  
 split_df   #THIS way WORKS TOO!
 
 
-#EXPLANATION - What is '.str' attribute? 
-#  = a MAGIC Object to COLLECT 'METHODS' which TREAT each Row ELEMENT in a COLUMN as a STRING.
+#IMPORTANT EXPLANATION - What is '.str' attribute? 
+#  = a MAGIC Object to COLLECT 'METHODS', to TREAT each ROW ELEMENT as a STRING, for a COLUMN.
 #    Then can APPLY any of these 'Methods' for EACH ELEMENT 'as EFFICIENTLY AS POSSIBLE'
 #e.g. Could apply ANY 'STRING MANIPULATION' METHOD - str.lower(), str.upper()...
-#'.str' ALSO lets you 'INDEX'. to get 'SPECIFIC INDEX' or 'slice/range' from a 'STRING' Value:
+
+#'.str' ALSO lets you 'INDEX' (SLICE PART of the STRING/Object) - get 'SPECIFIC INDEX' or 'slice/range' from a 'STRING' Value:
 split_df['AB'].str[:2]   #returns 'A1' for Row1 and 'A2' for Row2  - SIMPLE!
-#EVEN can 'INDEX' on the 'Elements' of the 'LIST Output', PRODUCED 'FROM .split()'
-split_df['AB'].str.split('-').str[1]   #SIMPLE! Gives 2nd Element of EACH 'List Row' - B1, B2 
+#EVEN can 'INDEX' on the 'ELEMENTS' of 'LIST OUTPUT', PRODUCED FROM '.split()'
+split_df['AB'].str.split('-')
+split_df['AB'].str.split('-').str[1]     #SIMPLE! Gives 2nd Element of EACH 'List Row' - B1, B2 
 
 
-#                SPLITTING COLUMN of 'LIST' ROWS:
+#              SPLITTING COLUMN which CONTAINS 'LIST' ROWS:
 #HOW can we 'SPLIT a Column' IF each 'ROW' is a 'LIST' of ELEMENTS?
 # - so want to SPLIT into 'NEW COLUMNS' for 'EACH ELEMENT' of the 'LIST'
 #EXAMPLE:
 dictionary = {'teams': [['SF', 'NYG'],['SF', 'NYG'],['SF', 'NYG'],
                 ['SF', 'NYG'],['SF', 'NYG'],['SF', 'NYG'],['SF', 'NYG']]}
 df1 = pd.DataFrame(dictionary) #first creating DataFrame FROM Dictionary (AS USUAL!)
+
 df1  #have 'teams' column, which has LISTS with 2 Elements
 #HOW can we SPLIT this DataFrame INTO 2 COLUMNS (for EACH List ELEMENT)?
 #Use  'df[['new_col1', 'new_col2]] = pd.DataFrame(df1['teams'].tolist(), index=df1.index)'
 df1[['team1', 'team2']] = pd.DataFrame(df1['teams'].tolist(), index=df1.index)
-#
 df1   #WORKED! Now Columns SPLIT for EACH 'team'!!!
+
+#LONGER Way? - split on ',' then strip '[' and ']':
+df1['teams'] = df1['teams'].astype('str')
+df1
+df1[['team1', 'team2']] = df1['teams'].str.split(', ', expand=True)
+#striping each column:
+df1['team1'] = df1['team1'].str.strip('[')
+df1['team2'] = df1['team2'].str.strip('] ' ' ')
+#ABOVE Method is BETTER!
+
 
 #Can then 'DROP' the Original Column MANUALLY, with 'df.drop()':
 df1.drop('teams', axis=1, inplace=True)
@@ -790,6 +766,241 @@ df1.drop('teams', axis=1, inplace=True)
 df_split = pd.DataFrame(df1['teams'].to_list(), columns=['team1', 'team2'])
 df_split                              #just do 'columns = ['col1, 'col2] as an ARGUMENT
 
+
+
+
+
+#%%              STRIP/REMOVE TEXT/WHITESPACE from 'Data Frame COLUMN' Values:
+
+#AGAIN, the '.str' attribute comes in handy!
+#BEST WAY - Use df['column'] = df['column'].str.strip('characters_to_strip')
+df['Country'].str.strip('')
+#Can specify ONE STRING of EVERYTHING TO STRIP:
+#  str.strip('.../_')   - handy!
+
+
+#OR, can use '.str.replace(" ", "") to REMOVE Whitespace characters, replacing with nothing!
+#(add 3rd argument in 'replace' IF you want to specify NUMBER of REPLACEMENTS to make
+# (e.g. ',replace("bill", "william", 3))  - done 3 times ONLY))
+
+#OR if ONLY wanting to strip LEADING whitespace, use 'str.lstrip'  -  SIMPLE!
+
+#Simple Example - using 'str.replace' to STANDARDIZE Column Values:
+df['Paying Customer'] = df['Paying Customer'].str.replace('Yes', 'Y')
+df['Paying Customer'] = df['Paying Customer'].str.replace('No', 'N')
+
+
+
+#                  REGULAR EXPRESSIONS for Data Cleaning
+
+#REMOVING an ENTIRE SUBSTRING from a String?
+#CANNOT use Wildcard '*' like in Find and Replace in Excel.
+#So? must use 're.sub(r'\(.*\)', '', 'text (###)' (REGULAR EXPRESSION)
+
+#Can use REGULAR EXPRESSION inside '.replace' too:
+
+#e.g. want ALL Phone Numbers in column to have '123-435-2341' format
+df['Phone Number'].str.replace('[^a-zA-Z0-9]', '')
+# Use '^' to match ALL EXCEPT LETTERS to 'a-z' OR 'A-Z' OR NUMBERS '0-9'
+#then REPLACE these exceptions with '' (Nothing/BLANK!)
+#now can REFORMAT to ADD the '-' within:
+#-first convert 'Phone Number' Column to 'STRING' (str) 
+df['Phone Number'].astype("str")
+#-Use FUNCTION to SLICE and ADD '-' in between:
+def apply_function(x):
+    x = x[0:3] + "-" + x[3:6] + '-' + x[6:]
+    return x
+#APPLY function TO COLUMN values, using df['Column'].apply(function)
+df['Phone Number'].apply(apply_function)
+#Notice some NA values, so can REMOVE these:
+df['Phone Number'].str.replace('nan--', '')
+df['Phone Number'].str.replace('Na--', '')
+
+
+
+#%%                   CATEGORICAL DATA
+#Different Summay Stats are needed for CATEGORICAL Data 
+#(above, for 'Quantitative/Numeric Data, used CENTRALITY/Central Tendency)
+import pandas as pd
+import numpy as np
+#Example 1 - 2015 NCY Tree Census Data (Survey of 50000 Trees in City, collected by park department employees...)
+nyc_trees = pd.read_csv(r"C:\Users\Ezhan Khan\Documents\PYTHON PRACTICE\Fundamental_Maths\nyc_tree_census.csv")
+print(nyc_trees.head())  
+# "status", "health, "spc_common", "neighborhood" are ALL CATEGORICAL VARIABLES!
+tree_species = nyc_trees["spc_common"] #Extract Columns (AS USUAL)
+
+
+#       NOMINAL Categorical Variables - MODE ONLY!
+#e.g. neighborhood, spc_common ...These have NO ORDER/Rank NOR Numerical equivalents - CANNOT CALCULATE Mean, Median, Nor ANY Measure of SPREAD!
+#    ONLY 'MODE' using '.value_counts()' Method:
+tree_counts = nyc_trees['neighborhood'].value_counts() 
+#This calculates COUNT of EACH VALUE IN a Variable COLUMN (neighborhood)
+#Returns a 'TABLE OF FREQUENCIES', DESCENDING ORDER, MODE = TOP ROW (DEFAULT)
+print(tree_counts)  #'Annadale-Huguenot...has MOST TREES - 950
+#Can EXTRACT THIS 'Neighborhood' using '.index[0]' - Each Value Count is an Index TOP to BOTTOM (Like list)!
+print(tree_counts.index[0])   #JUST Prints Neighborhood Name now - BETTER!
+
+
+#    ORDINAL Categorical Variables - MODE AND MEDIAN
+
+#   MODE - SAME WAY AS ABOVE!
+
+#   MEDIAN 
+#(Need to CONVERT to CATEGORY Data Type, THEN use '.cat.codes' attribute to assign EACH category a numerical value)
+# 1. First View LIST of 'UNIQUE' CATEGORIES/VALUES (WIHTIN the Categorical COLUMN/Variable):
+health_statuses = list(nyc_trees["health"].unique())
+health_statuses      #['Good', 'Poor', 'Fair' nan]
+                      
+# 2  Must MANUALLY ORDER this - Lowest to Highest (REMOVING 'nan')            
+health_ordered = ['Poor', 'Fair', 'Good'] 
+
+# 3. Need to assign a 'LEVEL' (RANK) to EACH Category:
+#    CONVERT to 'CATEGORY' Type!
+nyc_trees['health'] = Categorical(nyc_trees['health'], health_ordered, ordered=True)
+    #(3 Inputs - 'Categorical Column', Ordered Categories, 'ordered=True')
+#OR, can use 'df[column] = df[column].astype("category")' to do the SAME 
+    
+# 4. NOW, CONVERT Categories TO NUMERICAL Values (assign each category a numerical value):
+#    Use 'cat.codes' ATTRIBUTES - Calculate MEDIAN! 
+median_index = np.median(nyc_trees['health'].cat.codes)
+print(median_index) # '2' - tells us Index of CATEGORY IN 'Unique' List
+median_category = health_ordered[int(median_index)]
+print(median_category)  #'Good' is MEDIAN category!
+
+
+#      IMPORTANT POINT - 'MEAN' CANNOT be done for ORDINAL! 
+#'Ordered List' of Unique Categories is EQUALLY SPACED - Represented as EQUALLY SPACED 'INTEGER' NUMBERS
+#BUT,'Categories' as NOT ALWAYS EQUALLY SPACED THEMSELVES!
+     #(Differences BETWEEN Individual Categories MAY VARY)
+#For MEAN - SPACING 'MUST' BE EQUAL!
+#So, CANNOT Use these 'cat.codes Numbers' for MEAN - Since SPACING MATTERS FOR MEAN!
+#e.g. Happiness Score - 1=very unhappy, 5='very happy' - CANT Always Assume that DIFFERENCE between Categories are Equal!
+#        Example Why - MEAN 'Trunk Diam 'Category':  
+tree_census2 = pd.read_csv(r'C:\Users\Ezhan Khan\Documents\PYTHON PRACTICE\Fundamental_Maths\nyc_tree_census2.csv')    
+#EASY AS USUAL for simple 'Quantitative' Variable like 'trunk diameter':
+mean_diam = np.mean(tree_census2['trunk_diam'])
+print(mean_diam)      #11.27 inches Mean Diameter
+#BUT Now ALSO have an ORDINAL 'Trunk Diameter CATEGORIES'
+          #JUST FOLLOW USUAL PROCEEDURE:
+print(list(tree_census2['tree_diam_category'].unique()))
+#    ['Medium-Large (10-18in)', 'Large(18-24in)'....]
+tree_size_categories = ['Small (0-3in)', 'Medium (3-10in)', 'Medium-Large (10-18in)', 'Large (18-24in)', 'Very large (>24in)']
+tree_census2['tree_diam_category'] = pd.Categorical(tree_census2['tree_diam_category'],tree_size_categories, ordered=True)
+mean_diam_index = np.mean(tree_census2['tree_diam_category'].cat.codes)
+print(mean_diam_index)  #1.97 
+mean_diam_category = tree_size_categories[int(mean_diam_index)]          
+print(mean_diam_category)   #IN 'Medium (3-10in)' 
+#NOT CORRECT! - Calculated Quantintatively as '11.27 inches' - which is in 'Medium-Large'
+#Calculated WRONG CATEGORY - Mean for ORDINAL Data does NOT WORK! 
+
+
+#  PERCENTILES/IQR - 'SPREAD' for ORDINAL Categories:  (SAME WAY - using cat.codes!)
+# SD and Variance are ALSO NOT Interpretable since Depend ON MEAN
+#SO? Can use PROPORTIONS of Data IN a RANGE = PERCENTILES/Quantiles
+ #e.g. 'RANGE' of 80% of Data' = FROM '10th Percentile' TO '90th Percentile' (90-10=80%!)
+ #   This 'Range' Between 10-90th Percentiles = 'IQR' (INTERQUARTILE RANGE)    
+
+#Example - For Our TREE CENSUS 2, have 'tree_diam_category' (Ordinal Variable):
+tree_census2['tree_diam_category'] = pd.Categorical(tree_census2['tree_diam_category'], tree_size_categories, ordered=True)
+tree_census2['tree_diam_category'] = tree_census2['tree_diam_category'].astype("category")
+tree_census2['tree_diam_category'].dtype
+#Calculate 25th and 75th Percentiles: JUST use CAT CODES - (SAME WAY AS MEDIAN)
+p_25_index = np.percentile(tree_census2['tree_diam_category'].cat.codes, 25)
+p_25_category = tree_size_categories[int(p_25_index)]
+print(p_25_category)    # 'Medium (3-10in)' 
+p_75_index = np.percentile(tree_census2['tree_diam_category'].cat.codes, 75)
+p_75_category = tree_size_categories[int(p_75_index)]
+print(p_75_category)       # 'Large (18-24in)'
+#EASY! So, IQR=75-25='50% of Data' is from 'MEDIUM' TO 'LARGE' Tree Diameter!
+
+
+#           TABLE of 'PROPORTIONS' (% OF the TOTAL in Data):
+#'Mode' for Categorical uses '.value_counts()' (AS COVERED ALREADY)
+#This GIVES a 'TABLE OF 'FREQUENCIES'
+#BUT, BETTER to CONVERT to 'PROPORTIONS' (%) 
+#EXAMPLE - Tree Census 'Status':   
+proportions = tree_census2['status'].value_counts()/len(tree_census2['status'])
+# 1. So just DIVIDE by LENGTH OF the Tree Census 'Status' Column
+print(proportions)    #Alive=0.953, Stump=0.0267,Dead=0.0194
+# 2. OR, can Just do 'normalize=True' WITHIN value_counts (Simpler Way!):
+proportions = tree_census2['status'].value_counts(normalize=True)
+
+#IMPORTANT- 'MISSING VALUES' are Coded as 'NaN' in Table of Proportions
+#BY DEFAULT these are NOT COUNTED!
+#INCLUDE MISSING DATA by adding ARGUMENT 'dropna = False' in .value_counts() (i.e. DONT DROP IT!)
+#Note: '/len(..)' Method ALREADY DOES THIS! RESULT VALUES MAY VARY Slightly IF 'NaN' Present - DEPENDS ON METHOD USED!!
+print(tree_census2['health'].value_counts(dropna = False, normalize=True))  
+print(tree_census2['health'].value_counts(normalize=True))  
+#As expected, Proportions are LARGER WIHTOUT 'NaN' Values!
+
+
+#                 BINARY CATEGORICAL VARIABLES 
+# ONLY TWO CATEGORIES (y/n, True/False, 1/0...)
+# SUM = to Calculate Frequency AT a Certain Value (e.g. for '1' or '0' - 0 NOT Counted, so JUST Adds '1's - NICE!)
+# PROPORTIONS = 'MEAN'!    e.g. 'TRUE/FALSE' or 'y/n' 
+#'CONDITIONAL STATEMENTS' - Convert NON-BINARY TO BINARY 'TRUE or FALSE'
+#NOW just 'True' or 'False' - so USE ABOVE METHODS for Proportions OR Frequencies! - EASY! 
+
+#Example: Frequency and Proportion of Trees 'Alive'
+print(tree_census2['status']=='Alive')  #JUST Rows where 'Alive'
+alive_frequency = np.sum(tree_census2['status']=='Alive')
+print(alive_frequency)    # '47695' are ALIVE
+alive_proportion = np.mean(tree_census2['status']=='Alive')
+print(alive_proportion)   # '0.9539' are 'Alive'
+#Proportion (Mean) = Frequency 'TRUE'/ TOTAL Number of Column Elements
+print(alive_frequency / len(tree_census2['status']))
+#    (JUST ANOTHER WAY - SAME ANSWER!!!! - EASY!)
+
+#Example 2: For 'trunk_diam > 30'
+print(tree_census2['trunk_diam']>30) #tells us WHICH column elements this Condition is TRUE for and which are FALSE
+giant_frequency = np.sum(tree_census2['trunk_diam']>30)
+giant_proportion = np.mean(tree_census2['trunk_diam']>30)
+print(f"Frequency: {giant_frequency}, Proportion: {giant_proportion}")             
+   
+
+#%% CATEGORICAL VARIABLES - SUMMARY EXAMPLE: 'Automobile Evaluation Data'
+#Cost and Physical Attributes of 1000 Cars
+import numpy as np
+import pandas as pd
+car_eval = pd.read_csv(r'C:\Users\Ezhan Khan\Documents\PYTHON PRACTICE\Fundamental_Maths\car_eval_dataset.csv')
+
+#Want to Know 'FREQUENCIES' for 'Manufacturer Country' Categories:
+frequencies_table = car_eval['manufacturer_country'].value_counts()
+print(frequencies_table)   #MOST Cars are from JAPAN
+#Accessing for United States (4th element):
+print(frequencies_table.index[3])
+#Now  want Table of Proportions:
+proportions_table = car_eval['manufacturer_country'].value_counts(normalize=True)
+print(proportions_table)    
+
+#NOW, want 'buying_cost' Categories:
+buying_costs = list(car_eval['buying_cost'].unique())
+buying_costs_ordered = ['low', 'med', 'high', 'vhigh']
+car_eval['buying_cost'] = pd.Categorical(car_eval['buying_cost'], buying_costs_ordered, ordered=True)
+cost_median_index = np.median(car_eval['buying_cost'].cat.codes) 
+median_cost = buying_costs_ordered[int(cost_median_index)] 
+print(median_cost)   #'med' is Median Cost
+
+#Table of Proportions for 'luggage' Category:
+luggage_proportions = car_eval['luggage'].value_counts(dropna=True, normalize=True)
+print(luggage_proportions)   #No missing Values here..
+
+#Frequency and Proportions for SPECIFIC CATEGORIES IN a 'doors':
+frequency_5more = np.sum(car_eval['doors']=='5more')
+print(frequency_5more)    #'246' have cars with '5more' Doors
+proportion_5more = frequency_5more/len(car_eval['doors'])  
+print(proportion_5more) #0.246 proportion 
+#(OR could have found this using 'MEAN' - EITHER WAY WORKS!)
+
+
+#   'EXTRACTING' from ONE Column 'GIVEN CONDITION in ANOTHER COLUMN':
+US_buying_costs = car_eval[car_eval['manufacturer_country']=='United States']['buying_cost']
+print(US_buying_costs)  #SAME AS WHAT WE DID WITH WEATHER DATA!
+#Could use this for Table of Frequencies - if we want Data from ONE COLUMN GIVEN the CONDITION in the OTHER:
+print(US_buying_costs.value_counts())  
+#Lets us know that is MOSTLY 'LOW' Cost for 'US' Cars - NICE!
+print(car_eval[car_eval['manufacturer_country']=='Japan']['buying_cost'].value_counts())
+#Whereas, for 'JAPAN', is Mostly 'MEDIUM' Priced Cars!
 
 
 
